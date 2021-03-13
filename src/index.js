@@ -27,6 +27,12 @@ function checksExistsUserAccount(request, response, next) {
   return next();
 }
 
+function getTodo(userTodos, todoId) {
+  const findedTodo = userTodos.find((todo) => todo.id === todoId);
+
+  return findedTodo;
+}
+
 app.post("/users", (request, response) => {
   // Complete aqui
   const { name, username } = request.body;
@@ -79,10 +85,40 @@ app.post("/todos", checksExistsUserAccount, (request, response) => {
 
 app.put("/todos/:id", checksExistsUserAccount, (request, response) => {
   // Complete aqui
+  const { userAccount } = request;
+  const { title, deadline } = request.body;
+  const { id } = request.params;
+
+  const findedTodo = getTodo(userAccount.todos, id);
+
+  if (!findedTodo) {
+    return response.status(404).json({
+      error: "Todo not found!",
+    });
+  }
+
+  findedTodo.title = title;
+  findedTodo.deadline = new Date(deadline);
+
+  return response.status(201).json(findedTodo);
 });
 
 app.patch("/todos/:id/done", checksExistsUserAccount, (request, response) => {
   // Complete aqui
+  const { userAccount } = request;
+  const { id } = request.params;
+
+  const findedTodo = getTodo(userAccount.todos, id);
+
+  if (!findedTodo) {
+    return response.status(404).json({
+      error: "Todo not found!",
+    });
+  }
+
+  findedTodo.done = true;
+
+  return response.json(findedTodo);
 });
 
 app.delete("/todos/:id", checksExistsUserAccount, (request, response) => {
