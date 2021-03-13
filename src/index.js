@@ -12,6 +12,19 @@ const users = [];
 
 function checksExistsUserAccount(request, response, next) {
   // Complete aqui
+  const { username } = request.headers;
+
+  const userAccount = users.find((user) => user.username === username);
+
+  if (!userAccount) {
+    return response.status(400).json({
+      error: "User account not found!",
+    });
+  }
+
+  request.userAccount = userAccount;
+
+  return next();
 }
 
 app.post("/users", (request, response) => {
